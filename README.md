@@ -87,8 +87,8 @@ python examples/ttt_cli.py
 
 ## See Also
 
-- [lrgp-rs](../rlap-rs) — Rust implementation (wire-compatible)
+- [lrgp-rs](../lrgp-rs) — Rust implementation (wire-compatible)
 
 ## License
 
-AGPL-3.0 — see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).
