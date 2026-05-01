@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.3.0 — 2026-05-01
+
+### Added
+
+- **Chess (`chess.1`)** — second built-in game alongside Tic-Tac-Toe. UCI-only wire format, board state replayed locally via [python-chess](https://pypi.org/project/chess/), two-side validation. Terminal reason codes (`cm`, `sm`, `ins`, `3fr`, `50m`, `rsn`, `agr`) keep move envelopes ≤150 bytes. Available as `lrgp.apps.chess.ChessApp`.
+- **`[chess]` extra** — `pip install 'lrgp[chess]'` pulls in `chess>=1.10`. The chess module raises a clear `ImportError` if imported without the extra. Core lib stays zero-deps.
+- **`examples/chess_local.py`** — Scholar's Mate walkthrough between two `ChessApp` instances. Pins the coin via `force_coin(True)` for determinism.
+- **Chess binary test vectors** — `tests/vectors/chess_*.bin`. Byte-identical to `lrgp-rs/tests/chess_*.bin`; a divergence in either repo's vectors would surface immediately on test re-run.
+- **License switched to MIT** — was AGPL-3.0 in v0.2.0, now matches the long-standing pyproject.toml declaration.
+
+### Changed
+
+- **Wire `n` is now required.** Every envelope MUST carry an 8-byte CSPRNG nonce under key `n`. `unpack_envelope` rejects missing/malformed nonce. `ReplayDedup.check` returns `True` (drop) on protocol violations.
+- **SPEC.md updated to v0.3** — section 3.1 documents the replay-protection mechanism; appendix B documents the Chess reference game; legacy-marker section removed.
+- **`docs/wire-format.md` rewritten** — no longer references RLAP or the 4-key envelope; includes the Chess move shape and key-ordering note.
+
+### Removed
+
+- **Legacy protocol markers `rlap.v1` and `ratspeak.game`** are no longer recognized on inbound. Pre-release implementations using these markers must upgrade to `lrgp.v1`.
+- **`GameBase.migrate_legacy()`** — no longer needed now that legacy markers are gone.
+- **The `LEGACY_TYPES` constant.**
+
+---
+
 ## 0.2.0 — 2026-03-12
 
 ### Breaking — Renamed to LRGP
