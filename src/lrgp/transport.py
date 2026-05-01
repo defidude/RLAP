@@ -1,6 +1,6 @@
 """LRGP transport bridge for LXMF (optional, requires lrgp[rns])."""
 
-from .constants import FIELD_CUSTOM_TYPE, FIELD_CUSTOM_META, PROTOCOL_TYPE, LEGACY_TYPES
+from .constants import FIELD_CUSTOM_TYPE, FIELD_CUSTOM_META, PROTOCOL_TYPE
 from .envelope import pack_lxmf_fields
 
 
@@ -71,7 +71,7 @@ class LrgpTransport:
         def _on_message(lxm):
             fields = lxm.fields if hasattr(lxm, "fields") else {}
             custom_type = fields.get(FIELD_CUSTOM_TYPE, "")
-            if custom_type == PROTOCOL_TYPE or custom_type in LEGACY_TYPES:
+            if custom_type == PROTOCOL_TYPE:
                 envelope = fields.get(FIELD_CUSTOM_META, {})
                 sender = lxm.source_hash.hex() if hasattr(lxm, "source_hash") else ""
                 self._handler(envelope, sender, lxm)

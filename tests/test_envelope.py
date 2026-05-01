@@ -124,17 +124,15 @@ class TestUnpackEnvelope:
         with pytest.raises(InvalidEnvelope):
             unpack_envelope(fields)
 
-    def test_legacy_envelope_without_nonce_accepted(self):
-        # Pre-nonce peers don't include the ``n`` field. Receivers must
-        # treat them as valid envelopes; dedup protection simply doesn't
-        # kick in for their messages.
+    def test_envelope_without_nonce_rejected(self):
+        # KEY_NONCE is a required envelope key; missing it is a protocol
+        # violation that unpack_envelope must reject.
         fields = {
             FIELD_CUSTOM_TYPE: PROTOCOL_TYPE,
             FIELD_CUSTOM_META: {"a": "ttt.1", "c": "move", "s": "abc", "p": {}},
         }
-        result = unpack_envelope(fields)
-        assert result is not None
-        assert KEY_NONCE not in result
+        with pytest.raises(InvalidEnvelope):
+            unpack_envelope(fields)
 
     def test_malformed_nonce_wrong_length_raises(self):
         fields = {

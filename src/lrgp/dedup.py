@@ -1,6 +1,6 @@
 """Per-session envelope replay-dedup cache.
 
-LRGP envelopes carry an optional 8-byte ``n`` nonce (see ``envelope.py``).
+LRGP envelopes carry a required 8-byte ``n`` nonce (see ``envelope.py``).
 The receiver keeps a bounded, TTL'd cache of recently-seen ``(session_id,
 nonce)`` pairs. If an inbound envelope's nonce is already in the cache for
 that session, it is treated as a retransmit and dropped; otherwise the
@@ -41,16 +41,16 @@ class ReplayDedup:
         arrivals with the same nonce for the same session will be
         flagged as replays.
 
-        Envelopes without a ``KEY_NONCE`` field — legacy pre-nonce peers —
-        are always treated as fresh. The caller is expected to log such
-        peers once per session.
+        The envelope MUST be post-``unpack_envelope`` validated; missing or
+        malformed fields here are a protocol violation and are dropped as
+        replays.
         """
         nonce = envelope.get(KEY_NONCE)
-        if nonce is None:
-            return False
+        if not isinstance(nonce, (bytes, bytearray)):
+            return True
         session_id = envelope.get(KEY_SESSION)
-        if session_id is None:
-            return False
+        if not isinstance(session_id, str):
+            return True
 
         ts = time.monotonic() if now is None else now
         entries = self._by_session.get(session_id)

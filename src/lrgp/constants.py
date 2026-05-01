@@ -7,7 +7,6 @@ FIELD_FILE_ATTACHMENTS = 0x05
 
 # Protocol marker
 PROTOCOL_TYPE = "lrgp.v1"
-LEGACY_TYPES = ("rlap.v1", "ratspeak.game")
 
 # Size limits (bytes)
 ENVELOPE_MAX_PACKED = 200

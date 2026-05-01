@@ -3,7 +3,7 @@
 import os
 
 from .constants import (
-    FIELD_CUSTOM_TYPE, FIELD_CUSTOM_META, PROTOCOL_TYPE, LEGACY_TYPES,
+    FIELD_CUSTOM_TYPE, FIELD_CUSTOM_META, PROTOCOL_TYPE,
     ENVELOPE_MAX_PACKED, OPPORTUNISTIC_MAX_CONTENT,
     KEY_APP, KEY_COMMAND, KEY_SESSION, KEY_PAYLOAD, KEY_NONCE,
     NONCE_BYTES,
@@ -11,7 +11,7 @@ from .constants import (
 from .errors import EnvelopeTooLarge, InvalidEnvelope
 from ._msgpack import packb, unpackb
 
-_REQUIRED_KEYS = {KEY_APP, KEY_COMMAND, KEY_SESSION, KEY_PAYLOAD}
+_REQUIRED_KEYS = {KEY_APP, KEY_COMMAND, KEY_SESSION, KEY_PAYLOAD, KEY_NONCE}
 
 
 def generate_nonce():
@@ -78,8 +78,6 @@ def pack_lxmf_fields(envelope):
 def unpack_envelope(fields):
     """Extract and validate an LRGP envelope from LXMF fields.
 
-    Recognizes both lrgp.v1 and legacy rlap.v1/ratspeak.game markers.
-
     Args:
         fields: dict of LXMF fields (keyed by field ID).
 
@@ -90,7 +88,7 @@ def unpack_envelope(fields):
         InvalidEnvelope: if fields indicate LRGP but envelope is malformed.
     """
     custom_type = fields.get(FIELD_CUSTOM_TYPE, "")
-    if custom_type != PROTOCOL_TYPE and custom_type not in LEGACY_TYPES:
+    if custom_type != PROTOCOL_TYPE:
         return None
 
     envelope = fields.get(FIELD_CUSTOM_META)
@@ -105,15 +103,11 @@ def unpack_envelope(fields):
     if not isinstance(app_ver, str) or "." not in app_ver:
         raise InvalidEnvelope("Invalid app.version format: {!r}".format(app_ver))
 
-    # Validate the nonce if present; absence is accepted for backward
-    # compatibility with pre-nonce peers (the caller's dedup layer logs
-    # these once per session).
-    if KEY_NONCE in envelope:
-        n = envelope[KEY_NONCE]
-        if not isinstance(n, (bytes, bytearray)) or len(n) != NONCE_BYTES:
-            raise InvalidEnvelope(
-                "KEY_NONCE must be {}-byte bytes; got {!r}".format(NONCE_BYTES, n)
-            )
+    n = envelope[KEY_NONCE]
+    if not isinstance(n, (bytes, bytearray)) or len(n) != NONCE_BYTES:
+        raise InvalidEnvelope(
+            "KEY_NONCE must be {}-byte bytes; got {!r}".format(NONCE_BYTES, n)
+        )
 
     return envelope
 

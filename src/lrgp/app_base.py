@@ -85,10 +85,3 @@ class GameBase(ABC):
         if self.turn_timeout is not None:
             manifest["turn_timeout"] = self.turn_timeout
         return manifest
-
-    def migrate_legacy(self, envelope):
-        """Translate a legacy v0 envelope to LRGP v1 format.
-
-        Return None if this game doesn't recognize the legacy message.
-        """
-        return None

@@ -13,7 +13,8 @@ dependencies = []
 
 [project.optional-dependencies]
 rns = ["rns>=1.0", "lxmf>=0.9"]
-dev = ["pytest", "pytest-cov"]
+chess = ["chess>=1.10"]
+dev = ["pytest", "pytest-cov", "chess>=1.10"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

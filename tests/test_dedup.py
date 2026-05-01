@@ -38,17 +38,6 @@ class TestReplayDetection:
         assert d.check(_env("s1", b"\x44" * 8)) is False
 
 
-class TestLegacyPeerCompat:
-    def test_envelope_without_nonce_is_never_a_replay(self):
-        d = ReplayDedup()
-        legacy = {"a": "ttt.1", "c": "move", "s": "s1", "p": {}}
-        # A legacy peer could reasonably retransmit the same message; we
-        # cannot dedup without a nonce. Verify we never spuriously report
-        # these as replays.
-        assert d.check(legacy) is False
-        assert d.check(legacy) is False
-
-
 class TestLruEviction:
     def test_oldest_nonce_evicted_once_cap_exceeded(self):
         d = ReplayDedup(max_per_session=4)
